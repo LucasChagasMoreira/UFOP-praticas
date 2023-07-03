@@ -5,15 +5,19 @@ f x
 
 all1 :: (a -> Bool) -> [a] -> Bool
 all1 _ [] = True
-all1 f (x:xs) =  (f x) && (all1 f xs)
+all1 f (x:xs)
+  | f x = all1 f xs
+  | otherwise = False
+
+
 
 fall :: (a -> Bool) -> [a] -> Bool
-fall f x = foldr func True x
+fall f x = foldr step True x
   where
-    func x acc
-      | f x && acc = True
+    step a acc
+      | f a = acc
       | otherwise = False
-
+      
 akeWhile :: (a -> Bool) -> [a] ->[a]
 akeWhile _ [] = []
 akeWhile p (x : xs)
