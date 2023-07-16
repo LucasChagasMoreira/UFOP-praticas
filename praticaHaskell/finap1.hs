@@ -1,40 +1,45 @@
-prodimpar :: [Int] -> Int
-prodimpar [] = 1
-prodimpar (x:xs)
-    | x `mod` 2 == 0 = prodimpar xs
-    | otherwise = x * prodimpar xs
+type Data = String
+type Name = String
 
-prodimparv2 :: [Int] -> Int
-prodimparv2 x = foldr (*) 1 (filter odd x)
+data Item 
+    = File Name Data
+    | Dir Name [Item]
+    deriving Eq
 
+type FileSystem = [Item] 
 
-allnats :: [Int] -> Bool
-allnats [] = True
-allnats (x:xs)
-    | x > 0 = allnats xs
-    | otherwise = False
+name :: Item -> Name
+name (File x _) = x
+name (Dir x _) = x
 
-
-
-pairs :: [a] -> [(a,a)]
-pairs [] = []
-pairs [x] = []
-pairs (x:xs:xss) = (x,xs) : (pairs xss)
-
-
-prova :: (Int,Int) -> [Int]
-prova (x,y) = crial (x,y)
+directories :: FileSystem -> [Item]
+directories  = concatMap sla
     where
-        crial (a,b)
-            | a <= 0 = []
-            | otherwise = b : crial ((a-1,b))
+        sla (File _ _) = []
+        sla (Dir x y) = (Dir x y) : directories y
 
 
-uncompress :: [Int] -> [Int]
-uncompress xs
-    | allnats xs = foldr step [] listapronta
-    | otherwise = []
+
+files :: FileSystem -> [Item]
+files = concatMap files'
     where
-        listapronta = pairs xs
-        step a acc = prova a ++ acc
+      files' f@(File _ _) = [f]
+      files' (Dir _ subs) = files subs
 
+root :: FileSystem
+root = [
+         Dir "Documents"
+             [
+               Dir "Texts"
+                    [
+                      File "teste.txt"
+                           "12345"
+                    , File "Foo.tex" "45678"
+                    , File "bar.asc" ""
+                    ]
+             , Dir "Images" []
+             , Dir "Thrash" []
+             ]
+       , Dir "Programs"
+             [File "Sample.exe" "1010111101"]
+       ]
